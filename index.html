@@ -1,7 +1,36 @@
+<!DOCTYPE html>
 <html>
-	<style></style>
-	<body>
+	<head>
+		<meta charset="utf-8">
+		<script src="http://d3js.org/d3.v3.min.js"></script>
 		
+		<style></style>
+
+		<script type="text/javascript">
+			function draw(data) {
+				debugger;
+			}
+		</script>
+	</head>
+	<body>
+		<script type="text/javascript">
+			// load the dataset
+			d3.csv('titanic_survivors.csv', function(d) {
+			  d.Survived = +d.Survived;
+			  d.Age = +d.Age;
+			  d.SibSp = +d.SibSp;
+			  d.Parch = +d.Parch;
+			  d.Fare = +d.Fare;
+			  switch (d.Embarked) {
+			  	case 'C':
+			  		d.Embarked = 'Cherbourg, France';
+			  	case 'Q':
+			  		d.Embarked = 'Queenstown, Ireland';
+			  	case 'S':
+			  		d.Embarked = 'Southampton, UK';
+			  }
+			  return d;
+			}, draw);
+		</script>
 	</body>
-	<script></script>
 </html>
