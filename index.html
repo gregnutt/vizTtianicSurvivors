@@ -9,6 +9,86 @@
 		<script type="text/javascript">
 			function draw(data) {
 				debugger;
+
+			    /*
+			      D3.js setup code
+			    */
+
+		        "use strict";
+		        var margin = 75,
+		            width = 1400 - margin,
+		            height = 600 - margin;
+
+		        var x = d3.scale.ordinal()
+		        		  .rangeRoundBands([0,width], 0.5);
+
+		        var y = d3.scale.linear()
+		        		  .range([height, 0]);
+
+		        var xAxis = d3.svg.axis()
+		        			  .scale(x)
+		        			  .orient('bottom')
+		        			  .tickFormat(function(d) { if (d.Survived = 0) {
+		        			  									return "Died";
+		        			  								} else {
+		        			  									return "Survived";
+		        			  								}
+		        			  						  });
+
+		        var yAxis = d3.svg.axis()
+		        			  .scale(y)
+		        			  .orient('left')
+		        			  .ticks(50);
+
+		        var svg = d3.select("body")
+		            .append("svg")
+		              .attr("width", width + margin)
+		              .attr("height", height + margin)
+		            .append('g')
+		                .attr('class','chart');
+
+		        // Remove any emmpty values for Age
+		        var age_null = [];
+		        for (i = 0; i < data.length; i++) {
+		        	if (data[i].Age == 0) {
+		        		age_null.push(i);
+		        	}
+		        }
+		        for (i = 0; i < age_null.length; i++) {
+		        	data.splice(age_null[i]-i, 1);
+		        }
+
+		        // Remove any empty values for Fare
+		        var fare_null = [];
+		        for (i = 0; i < data.length; i++) {
+		        	if (data[i].Fare == 0) {
+		        		fare_null.push(i);
+		        	}
+		        }
+		        for (i = 0; i < fare_null.length; i++) {
+		        	data.splice(fare_null[i]-i, 1);
+		        }
+
+		        // Remove any emmpty values for Embarked
+		        var embarked_null = [];
+		        for (i = 0; i < data.length; i++) {
+		        	if (data[i].Embarked == "") {
+		        		embarked_null.push(i);
+		        	}
+		        }
+		        for (i = 0; i < embarked_null.length; i++) {
+		        	data.splice(embarked_null[i]-i, 1);
+		        }
+
+		        var data_survived =_d3.nest()
+		            .key(function(d) { return d.Survived; })
+		            .entries(data);
+
+		        x.domain([0,1]);
+		        y.domain([0, function(d) { 
+		        							var len
+		        						 }])
+
 			}
 		</script>
 	</head>
