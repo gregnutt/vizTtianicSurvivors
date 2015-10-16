@@ -8,7 +8,6 @@
 
 		<script type="text/javascript">
 			function draw(data) {
-				debugger;
 
 			    /*
 			      D3.js setup code
@@ -47,39 +46,27 @@
 		            .append('g')
 		                .attr('class','chart');
 
-		        // Remove any emmpty values for Age
-		        var age_null = [];
-		        for (i = 0; i < data.length; i++) {
-		        	if (data[i].Age == 0) {
-		        		age_null.push(i);
+		        function data_trim(d, field, null_value) { 
+		        	// Abstracted function to remove empty values from the dataset
+		        	var null_entries = [];
+
+		        	for (var i = 0; i < d.length; i++) {
+		        		if (d[i][field] == null_value) {
+		        			null_entries.push(i);
+		        		}
 		        	}
-		        }
-		        for (i = 0; i < age_null.length; i++) {
-		        	data.splice(age_null[i]-i, 1);
+		        	for (var i = 0; i < null_entries.length; i++) {
+		        		d.splice(null_entries[i]-i, 1);
+		        	}
+
+		        	return d;
 		        }
 
-		        // Remove any empty values for Fare
-		        var fare_null = [];
-		        for (i = 0; i < data.length; i++) {
-		        	if (data[i].Fare == 0) {
-		        		fare_null.push(i);
-		        	}
-		        }
-		        for (i = 0; i < fare_null.length; i++) {
-		        	data.splice(fare_null[i]-i, 1);
-		        }
-
-		        // Remove any emmpty values for Embarked
-		        var embarked_null = [];
-		        for (i = 0; i < data.length; i++) {
-		        	if (data[i].Embarked == "") {
-		        		embarked_null.push(i);
-		        	}
-		        }
-		        for (i = 0; i < embarked_null.length; i++) {
-		        	data.splice(embarked_null[i]-i, 1);
-		        }
-
+		        // Remove any empty values for Age, Fare, and Embarked
+		        data = data_trim(data, 'Age', 0);
+		        data = data_trim(data, 'Fare', 0);
+		        data = data_trim(data, 'Embarked', "");
+		        
 		        var data_survived =_d3.nest()
 		            .key(function(d) { return d.Survived; })
 		            .entries(data);
