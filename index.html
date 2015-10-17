@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<script src="http://d3js.org/d3.v3.min.js"></script>
-		
+
 		<style></style>
 
 		<script type="text/javascript">
@@ -12,17 +12,18 @@
 			      D3.js setup code
 			    */
 		        "use strict";
+		        var i, j;
 
 		        function data_trim(d, field, null_value) { 
 		        	// Abstracted function to remove empty values from the dataset
 		        	var null_entries = [];
 
-		        	for (var i = 0; i < d.length; i++) {
+		        	for (i = 0; i < d.length; i++) {
 		        		if (d[i][field] == null_value) {
 		        			null_entries.push(i);
 		        		}
 		        	}
-		        	for (var i = 0; i < null_entries.length; i++) {
+		        	for (i = 0; i < null_entries.length; i++) {
 		        		d.splice(null_entries[i]-i, 1);
 		        	}
 
@@ -35,7 +36,7 @@
 		        data = data_trim(data, 'Embarked', "");
 
 		        // Bin Passengers by age group
-		        for (var i = 0; i < data.length; i++) {
+		        for (i = 0; i < data.length; i++) {
 	        		if (data[i].Age < 10) {
 				  		data[i].AgeRange = '<10 Years';
 	        		}
@@ -55,7 +56,7 @@
 				  		data[i].AgeRange = '50 to 60 Years';
 				  	}
 				  	else if (data[i].Age >= 60) {
-				  		data[i].AgeRange = '60+ Years'; 
+				  		data[i].AgeRange = '60+ Years';
 				  	}
 		        }
 
@@ -91,7 +92,7 @@
 		        var svg = d3.select("body")
 		            .append("svg")
 		              .attr("width", width + margin)
-		              .attr("height", height + margin)
+		              .attr("height", height + margin);
 
 		        var chart = svg.append('g').attr('class','chart');
 		        var xAxisGroup = svg.append('g').attr('class', 'x axis');
@@ -134,7 +135,44 @@
 		        			  .call(yAxis);
 		        };
 
+		        // Update Bars
+		        var updateBars = function() {
 
+		        	var color = {
+		        				  'male'   : '#3399FF',
+		        				  'female' : '#FF3399'
+		        				};
+
+		        	// Group setup
+		        	var barGroups = chartGroup.selectAll('.barGroup')
+		        							  .data(data);
+					barGroups.enter()
+							 .append('svg:g')
+							 .attr('class': 'barGroup');
+
+					// Stacked group setup
+					var bars = barGroups.selectAll('.bar')
+							 			.data(function(d) { return d; });
+
+					bars.enter()
+						.append('svg:rect')
+						.attr('class', 'bar')
+						.attr('width', xScale.rangeBand())
+						.attr('x', function(d, i) { return xScale(d.AgeRange); })
+						.attr('y', function(d, i) { return yScale(d.y0); })
+						.attr('height', function(d, i) {
+											return (yScale(0) - yScale(d.size)) / 2;
+										})
+						.style('fill', function(d) { return color(d.sex); });
+
+					bars.transition()
+						.attr('width', xScale.rangeBand())
+						.attr('x', function(d, i) { return xScale(d.AgeRange); })
+						.attr('y', function(d, i) { return yScale(d.y0); })
+						.attr('height', function(d, i) { return yScale(0) - yScale(d.size); });
+		        };
+
+		        return bars;
 			}
 		</script>
 	</head>
@@ -150,10 +188,13 @@
 				switch (d.Embarked) {
 				  	case 'C':
 				  		d.Embarked = 'Cherbourg, France';
+				  		break;
 				  	case 'Q':
 				  		d.Embarked = 'Queenstown, Ireland';
+				  		break;
 				  	case 'S':
 						d.Embarked = 'Southampton, UK';
+				  		break;
 				}
 			    return d;
 			}, draw);
