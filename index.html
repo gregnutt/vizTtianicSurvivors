@@ -8,7 +8,7 @@
 
 		<script type="text/javascript">
 
-	        var i, j;
+	        var i, j, data, nested;
 
 	        function data_trim(d, field, null_value) { 
 	        	// Abstracted function to remove empty values from the dataset
@@ -35,9 +35,9 @@
 	        		// Below Axis
 	        		var baseDied = 0;
 
-	        		for (var j = 0; j < data[i][j].length; j++) {
+	        		for (var j = 0; j < data[i].values.length; j++) {
 	        			// For each passenger in the group
-	        			passenger = data[i][j];
+	        			passenger = data[i].values[j];
 
 	        			if (passenger.Survived === 0) {
 	        				passenger.y0 = baseDied;
@@ -67,8 +67,9 @@
 
 	        // Setup Scales and Axes
 	        var updateScales = function updateScales() {
+	        	debugger;
 	        	var xScale = d3.scale.ordinal()
-	        		.domain(data.map(function(d) {
+	        		.domain(data.map(function(d, i) {
 						        	 	return d[0].AgeRange;
 						        	}))
 	        		.rangeRoundBands([margin, width - margin], 0.05);
@@ -146,13 +147,12 @@
 			      D3.js setup code
 			    */
 		        "use strict";
-		        debugger;
+
 		        // Format the data //
 		        // Remove any empty values for Age, Fare, and Embarked
 		        data = data_trim(data, 'Age', 0);
 		        data = data_trim(data, 'Fare', 0);
 		        data = data_trim(data, 'Embarked', "");
-		        debugger;
 
 		        // Bin Passengers by age group
 		        for (i = 0; i < data.length; i++) {
@@ -180,7 +180,12 @@
 		        }
 		        debugger;
 
-		        data = setupStack(data);
+		        var nested = d3.nest()
+							              .key(function(d) { return d.Sex; })
+							              .entries(data);
+		        debugger;
+
+		        nested = setupStack(nested);
 		        debugger;
 
 		        updateScales();
