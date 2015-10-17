@@ -12,24 +12,6 @@
 			      D3.js setup code
 			    */
 		        "use strict";
-		        var margin = 75,
-		            width = 1400 - margin,
-		            height = 600 - margin;
-
-		        var x = d3.scale.linear()
-		          	  .domain([0, d3.max(data, function(d) { return d.Age; })])
-		          	  .range([0, width]);
-
-		        var y = d3.scale.linear()
-		        	  .domain([])
-		        	  .range([]);
-
-		        var svg = d3.select("body")
-		            .append("svg")
-		              .attr("width", width + margin)
-		              .attr("height", height + margin)
-		            .append('g')
-		                .attr('class','chart');
 
 		        function data_trim(d, field, null_value) { 
 		        	// Abstracted function to remove empty values from the dataset
@@ -86,22 +68,71 @@
 		        		var baseDied = 0;
 
 		        		for (var j = 0; j < data[i][j].length; j++) {
-		        			// For each item in the group
-		        			stackItem = data[i][j];
+		        			// For each passenger in the group
+		        			passenger = data[i][j];
 
-		        			if (stackItem.Survived === 0) {
-		        				stackItem.y0 = baseDied;
+		        			if (passenger.Survived === 0) {
+		        				passenger.y0 = baseDied;
 		        				baseDied -= 1;
-		        			} else if (stackItem.Survived === 1) {
+		        			} else if (passenger.Survived === 1) {
 		        				baseSurvived += 1;
-		        				stackItem.y0 = baseSurvived;
+		        				passenger.y0 = baseSurvived;
 		        			}
 		        		}
 		        	}
-
 		        	return data;
 		        };
 
+		        // Setup SVG space
+		        var margin = 75,
+		            width = 1400 - margin,
+		            height = 600 - margin;
+
+		        var svg = d3.select("body")
+		            .append("svg")
+		              .attr("width", width + margin)
+		              .attr("height", height + margin)
+
+		        var chart = svg.append('g').attr('class','chart');
+		        var xAxisGroup = svg.append('g').attr('class', 'x axis');
+		        var yAxisGroup = svg.append('g').attr('class', 'y axis');
+
+		        // Setup Scales and Axes
+		        var updateScales = function updateScales() {
+		        	var xScale = d3.scale.ordinal()
+		        		.domain(data.map(function(d) {
+							        	 	return d[0].AgeRange;
+							        	}))
+		        		.rangeRoundBands([margin, width - margin], 0.05);
+
+		        	var merged = d3.merge(data);
+		        	var yScale = d3.scale.linear()
+		        				   .domain([
+		        				   		// the min is the base y (y0) minus 1 for the count
+		        				   		d3.min(merged, function(d) { return d.y0 - d.size; }),
+		        				   		// y0 wil contain the highest value
+		        				   		d3.max(merged, function(d) { return d.y0; })
+		        				   	])
+		        				   .range([height - margin, margin]);
+		        };
+
+		        var updateAxis = function() {
+		        	var xAxis = d3.svg.axis()
+		        				  .scale(xScale)
+		        				  .orient('bottom')
+		        				  .tickSize(6, 0);
+
+		        	var yAxis = d3.svg.axis()
+		        				  .scale(yScale)
+		        				  .orient('left');
+
+		        	xAxisGroup.transition()
+		        			  .attr('transform', 'translate (' + [0, yScale(0)] + ')')
+		        			  .call(xAxis);
+		        	yAxisGroup.transition()
+		        			  .attr('transform', 'translate (' + [xScale(margin), 0] + ')')
+		        			  .call(yAxis);
+		        };
 
 
 			}
