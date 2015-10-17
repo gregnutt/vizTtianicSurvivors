@@ -51,6 +51,7 @@
 		        data = data_trim(data, 'Age', 0);
 		        data = data_trim(data, 'Fare', 0);
 		        data = data_trim(data, 'Embarked', "");
+
 		        // Bin Passengers by age group
 		        for (var i = 0; i < data.length; i++) {
 	        		if (data[i].Age < 10) {
@@ -76,11 +77,32 @@
 				  	}
 		        }
 
-			    debugger;
+		        var setupStack = function setupStack(data){
+		       	// Function to split bar above and below xAxis
+		        	for (var i = 0; i < data.length; i++) {
+		        		// Above Axis
+		        		var baseSurvived = 0;
+		        		// Below Axis
+		        		var baseDied = 0;
 
-		        var data_survived =_d3.nest()
-		            .key(function(d) { return d.Survived; })
-		            .entries(data);
+		        		for (var j = 0; j < data[i][j].length; j++) {
+		        			// For each item in the group
+		        			stackItem = data[i][j];
+
+		        			if (stackItem.Survived === 0) {
+		        				stackItem.y0 = baseDied;
+		        				baseDied -= 1;
+		        			} else if (stackItem.Survived === 1) {
+		        				baseSurvived += 1;
+		        				stackItem.y0 = baseSurvived;
+		        			}
+		        		}
+		        	}
+
+		        	return data;
+		        };
+
+
 
 			}
 		</script>
