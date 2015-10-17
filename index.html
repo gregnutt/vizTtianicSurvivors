@@ -8,36 +8,21 @@
 
 		<script type="text/javascript">
 			function draw(data) {
-
 			    /*
 			      D3.js setup code
 			    */
-
 		        "use strict";
 		        var margin = 75,
 		            width = 1400 - margin,
 		            height = 600 - margin;
 
-		        var x = d3.scale.ordinal()
-		        		  .rangeRoundBands([0,width], 0.5);
+		        var x = d3.scale.linear()
+		          	  .domain([0, d3.max(data, function(d) { return d.Age; })])
+		          	  .range([0, width]);
 
 		        var y = d3.scale.linear()
-		        		  .range([height, 0]);
-
-		        var xAxis = d3.svg.axis()
-		        			  .scale(x)
-		        			  .orient('bottom')
-		        			  .tickFormat(function(d) { if (d.Survived = 0) {
-		        			  									return "Died";
-		        			  								} else {
-		        			  									return "Survived";
-		        			  								}
-		        			  						  });
-
-		        var yAxis = d3.svg.axis()
-		        			  .scale(y)
-		        			  .orient('left')
-		        			  .ticks(50);
+		        	  .domain([])
+		        	  .range([]);
 
 		        var svg = d3.select("body")
 		            .append("svg")
@@ -66,15 +51,36 @@
 		        data = data_trim(data, 'Age', 0);
 		        data = data_trim(data, 'Fare', 0);
 		        data = data_trim(data, 'Embarked', "");
-		        
+		        // Bin Passengers by age group
+		        for (var i = 0; i < data.length; i++) {
+	        		if (data[i].Age < 10) {
+				  		data[i].AgeRange = '<10 Years';
+	        		}
+				  	else if (data[i].Age >= 10 && data[i].Age < 20) {
+				  		data[i].AgeRange = '10 to 20 Years';
+				  	}
+				  	else if (data[i].Age >= 20 && data[i].Age < 30) {
+				  		data[i].AgeRange = '20 to 30 Years';
+				  	}
+				  	else if (data[i].Age >= 30 && data[i].Age < 40) {
+				  		data[i].AgeRange = '30 to 40 Years';
+				  	}
+				  	else if (data[i].Age >= 40 && data[i].Age < 50) {
+				  		data[i].AgeRange = '40 to 50 Years';
+				  	}
+				  	else if (data[i].Age >= 50 && data[i].Age < 60) {
+				  		data[i].AgeRange = '50 to 60 Years';
+				  	}
+				  	else if (data[i].Age >= 60) {
+				  		data[i].AgeRange = '60+ Years'; 
+				  	}
+		        }
+
+			    debugger;
+
 		        var data_survived =_d3.nest()
 		            .key(function(d) { return d.Survived; })
 		            .entries(data);
-
-		        x.domain([0,1]);
-		        y.domain([0, function(d) { 
-		        							var len
-		        						 }])
 
 			}
 		</script>
@@ -83,20 +89,20 @@
 		<script type="text/javascript">
 			// load the dataset
 			d3.csv('titanic_survivors.csv', function(d) {
-			  d.Survived = +d.Survived;
-			  d.Age = +d.Age;
-			  d.SibSp = +d.SibSp;
-			  d.Parch = +d.Parch;
-			  d.Fare = +d.Fare;
-			  switch (d.Embarked) {
-			  	case 'C':
-			  		d.Embarked = 'Cherbourg, France';
-			  	case 'Q':
-			  		d.Embarked = 'Queenstown, Ireland';
-			  	case 'S':
-			  		d.Embarked = 'Southampton, UK';
-			  }
-			  return d;
+				d.Survived = +d.Survived;
+				d.Age = +d.Age;
+				d.SibSp = +d.SibSp;
+				d.Parch = +d.Parch;
+				d.Fare = +d.Fare;
+				switch (d.Embarked) {
+				  	case 'C':
+				  		d.Embarked = 'Cherbourg, France';
+				  	case 'Q':
+				  		d.Embarked = 'Queenstown, Ireland';
+				  	case 'S':
+						d.Embarked = 'Southampton, UK';
+				}
+			    return d;
 			}, draw);
 		</script>
 	</body>
