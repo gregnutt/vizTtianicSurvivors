@@ -29,6 +29,7 @@
 	        	'60+ Years'
 	        ];
 	        var i, j;
+	        var sortField;
 
 	        function dataTrim(d, field, null_value) {
 	        	// Abstracted function to remove empty values from the dataset
@@ -47,14 +48,15 @@
 	        }
 
 	        function sortData(data, sort_field) {
+	        	var sortFxn = function(a, b) { 
+				        			var keyA = a[sort_field],
+				        				keyB = b[sort_field];
+				        			if (keyA < keyB) { return -1; }
+				        			if (keyA > keyB) { return  1; }
+				        			return 0; 
+				        		};
 		        for (i = 0; i < data.length; i++) {
-		        	data[i].sort(function(a, b) { 
-		        			var keyA = a[sort_field],
-		        				keyB = b[sort_field];
-		        			if (keyA < keyB) { return -1; }
-		        			if (keyA > keyB) { return  1; }
-		        			return 0; 
-		        		})
+		        	data[i].sort(sortFxn);
 		        }
 		        return data;
 	        }
@@ -145,7 +147,10 @@
 
 	        	var color = {
 	        				  'male'   : '#3399FF',
-	        				  'female' : '#FF3399'
+	        				  'female' : '#FF3399',
+	        				  '1Class' : '#B2D9B2',
+	        				  '2Class' : '#008000',
+	        				  '3Class' : '#002600'
 	        				};
 
 	        	// Group setup
@@ -228,17 +233,8 @@
 		        }
 
 		        // Sort by Gender
-		        ages_data = sortData(ages_data, 'Sex');
-		        // for (i = 0; i < ages_data.length; i++) {
-		        // 	ages_data[i].sort(function(a, b) { 
-		        // 			var keyA = a.Sex,
-		        // 				keyB = b.Sex;
-		        // 			if (keyA < keyB) { return -1; }
-		        // 			if (keyA > keyB) { return  1; }
-		        // 			return 0; 
-		        // 		})
-		        // }
-		        debugger;
+		        sortField = 'Sex'
+		        ages_data = sortData(ages_data, sortField);
 
 		        setupSpace();
 
