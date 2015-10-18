@@ -30,7 +30,7 @@
 	        ];
 	        var i, j;
 
-	        function data_trim(d, field, null_value) {
+	        function dataTrim(d, field, null_value) {
 	        	// Abstracted function to remove empty values from the dataset
 	        	var null_entries = [];
 
@@ -46,6 +46,18 @@
 	        	return d;
 	        }
 
+	        function sortData(data, sort_field) {
+		        for (i = 0; i < data.length; i++) {
+		        	data[i].sort(function(a, b) { 
+		        			var keyA = a[sort_field],
+		        				keyB = b[sort_field];
+		        			if (keyA < keyB) { return -1; }
+		        			if (keyA > keyB) { return  1; }
+		        			return 0; 
+		        		})
+		        }
+		        return data;
+	        }
 
 	        var setupStack = function setupStack(data){
 	       	// Function to split bar above and below xAxis
@@ -176,9 +188,9 @@
 
 		        // Format the data //
 		        // Remove any empty values for Age, Fare, and Embarked
-		        data = data_trim(data, 'Age', 0);
-		        data = data_trim(data, 'Fare', 0);
-		        data = data_trim(data, 'Embarked', "");
+		        data = dataTrim(data, 'Age', 0);
+		        data = dataTrim(data, 'Fare', 0);
+		        data = dataTrim(data, 'Embarked', "");
 
 				// Bin Passengers by age group
 		        for (i = 0; i < data.length; i++) {
@@ -215,6 +227,19 @@
 		        	}
 		        }
 
+		        // Sort by Gender
+		        ages_data = sortData(ages_data, 'Sex');
+		        // for (i = 0; i < ages_data.length; i++) {
+		        // 	ages_data[i].sort(function(a, b) { 
+		        // 			var keyA = a.Sex,
+		        // 				keyB = b.Sex;
+		        // 			if (keyA < keyB) { return -1; }
+		        // 			if (keyA > keyB) { return  1; }
+		        // 			return 0; 
+		        // 		})
+		        // }
+		        debugger;
+
 		        setupSpace();
 
 		        var stacked_data = setupStack(ages_data);
@@ -224,7 +249,6 @@
 		        updateAxis();
 
 		        updateBars(stacked_data);
-		        debugger;
 			};
 		</script>
 	</head>
