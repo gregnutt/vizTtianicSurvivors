@@ -12,6 +12,7 @@
 
 			.axis text {
 				  font: 12px sans-serif;
+				  font-weight: bold;
 				}
 
 			.axis path,
@@ -34,8 +35,16 @@
 	        	'50 to 60 Years',
 	        	'60+ Years'
 	        ];
-	        var i, j;
-	        var sortField;
+	        var i, j, stacked_data;
+	        var margin, width, height;
+	        var svg, chartGroup, xAxisGroup, yAxisGroup;
+	        var xScale, yScale, merged;
+	        var sortField = 'Sex';
+	        var sort_list = {
+	        	'Sex' : ['Male', 'Female'],
+	        	'Pclass' : ['1st Class', '2nd Class', '3rd Class'],
+	        	'Embarked' : ['Cherbourg, France', 'Queenstown, Ireland', 'Southampton, UK']
+	        };
 
 	        function dataTrim(d, field, null_value) {
 	        	// Abstracted function to remove empty values from the dataset
@@ -53,10 +62,10 @@
 	        	return d;
 	        }
 
-	        function sortData(data, sort_field) {
+	        function sortData(data) {
 	        	var sortFxn = function(a, b) {
-				        			var keyA = a[sort_field],
-				        				keyB = b[sort_field];
+				        			var keyA = a[sortField],
+				        				keyB = b[sortField];
 				        			if (keyA < keyB) { return -1; }
 				        			if (keyA > keyB) { return  1; }
 				        			return 0;
@@ -91,9 +100,6 @@
 	        	return data;
 	        };
 
-	        var margin, width, height;
-	        var svg, chartGroup, xAxisGroup, yAxisGroup;
-
 	        var setupSpace = function setupSpace() {
 		        // Setup SVG space
 		        margin = 75;
@@ -102,7 +108,7 @@
 
 		        title = d3.select('body')
 		        		  .append('h2')
-		        		  .text('Titanic Survivors');
+		        		  .text('Number of Titanic Survivors by Age Range');
 
 		        svg = d3.select("body")
 		        	    .append("svg")
@@ -113,8 +119,6 @@
 		        xAxisGroup = svg.append('g').attr('class', 'x axis');
 		        yAxisGroup = svg.append('g').attr('class', 'y axis');
 	        };
-
-	        var xScale, yScale, merged;
 
 	        // Setup Scales and Axes
 	        var updateScales = function updateScales(data) {
@@ -157,7 +161,7 @@
 	        		.attr('x', 0 - ((height / 2) - 130))
 	        		.attr('dy', '1em')
 	        		.style('text-anchor', 'middle')
-	        		.text('Survived');
+	        		.text('Number of Survivors');
 
 	        	yAxisGroup.append('text')
 	        		.attr('transform', 'rotate(-90)')
@@ -165,18 +169,21 @@
 	        		.attr('x', 0 - ((height / 2) + 30))
 	        		.attr('dy', '1em')
 	        		.style('text-anchor', 'middle')
-	        		.text('Died');
+	        		.text('Number of Casualties');
 	        };
 
 	        // Update Bars
 	        var updateBars = function updateBars(data) {
 
 	        	var color = {
-	        				  'male'   : '#3F51b5',
-	        				  'female' : '#FF4081',
-	        				  '1class' : '#B2D9B2',
-	        				  '2class' : '#008000',
-	        				  '3class' : '#002600'
+	        				  'male'   				: '#3366CC',
+	        				  'female' 				: '#FF4081',
+	        				  '1st class' 			: '#66c2a5',
+	        				  '2nd class' 			: '#fc8d62',
+	        				  '3rd class' 			: '#8da0cb',
+	        				  'cherbourg, france'   : '#66c2a5',
+	        				  'queenstown, ireland' : '#fc8d62',
+	        				  'southampton, uk'     : '#8da0cb'
 	        				};
 
 	        	// Group setup
@@ -189,7 +196,7 @@
 				// Stacked group setup
 				var bars = barGroups.selectAll('.bar')
 						 			.data(function(d) { return d; });
-
+				debugger;
 				bars.enter()
 					.append('svg:rect')
 					.attr('class', 'bar')
@@ -199,8 +206,7 @@
 					.attr('height', function(d, i) {
 										return (yScale(0) - yScale(1)) / 2;
 									})
-					// .style('fill', 'lightblue');
-					.style('fill', function(d) { return color[d.Sex]; });
+					.style('fill', function(d, i) { return color[d[sortField].toLowerCase()]; });
 
 				bars.transition()
 					.attr('width', xScale.rangeBand())
@@ -212,8 +218,14 @@
 								.attr('class', 'legend')
 								.attr('transform', 'translate(' + (width - 100) + ', ' + 20 + ')')
 								.selectAll('g')
-								.data(['Male', 'Female'])
+								// .data(['Male', 'Female'])
+								.data(sort_list[sortField])
 								.enter().append('g');
+
+				legend.append('text')
+					  .attr('y', function(d, i) { return -7; })
+					  .attr('x', 15)
+					  .text('Sorted by ' + sortField);
 
 				legend.append('rect')
 					  .attr('y', function(d, i) { return i * 30; })
@@ -230,7 +242,19 @@
         		return bars;
 	        };
 
-			var updateChart = function updateChart(data) {
+	        var updateSpace = function updateSpace(data) {
+		        ages_data = sortData(data);
+
+		        stacked_data = setupStack(ages_data);
+
+		        updateScales(stacked_data);
+
+		        updateAxis();
+
+		        updateBars(stacked_data, sortField);
+        	};
+
+			var updateChart = function updateChart(data, sortField) {
 			    /*
 			      D3.js setup code
 			    */
@@ -278,18 +302,24 @@
 		        }
 
 		        // Sort by Gender
-		        sortField = 'Sex';
-		        ages_data = sortData(ages_data, sortField);
+		        // sortField = 'Sex';
+		        // sortField = 'Pclass';
+		        // sortField = 'Embarked';
+		        // ages_data = sortData(ages_data);
 
 		        setupSpace();
 
-		        var stacked_data = setupStack(ages_data);
+		        // var stacked_data = setupStack(ages_data);
 
-		        updateScales(stacked_data);
+		        // updateScales(stacked_data);
 
-		        updateAxis();
+		        // updateAxis();
 
-		        updateBars(stacked_data);
+		        // updateBars(stacked_data, sortField);
+
+		        updateSpace(ages_data);
+
+		        debugger;
 			};
 		</script>
 	</head>
@@ -302,6 +332,17 @@
 				d.SibSp = +d.SibSp;
 				d.Parch = +d.Parch;
 				d.Fare = +d.Fare;
+				switch (d.Pclass) {
+					case "1" :
+						d.Pclass = '1st Class';
+						break;
+					case "2" :
+						d.Pclass = '2nd Class';
+						break;
+					case "3" :
+						d.Pclass = '3rd Class';
+						break;
+				}
 				switch (d.Embarked) {
 				  	case 'C':
 				  		d.Embarked = 'Cherbourg, France';
@@ -314,7 +355,7 @@
 				  		break;
 				}
 			    return d;
-			}, updateChart);
+			}, function(error, rows) { return updateChart(rows); });
 		</script>
 	</body>
 </html>
