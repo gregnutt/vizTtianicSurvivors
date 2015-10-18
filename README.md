@@ -18,3 +18,13 @@ http://www.w3schools.com/tags/ref_colorpicker.asp
 #####Positive/Negative Stacked Bar Chart Example
 http://tributary.io/inlet/6116099
 
+#####Help with Axes Labels
+http://www.d3noob.org/2012/12/adding-axis-labels-to-d3js-graph.html
+
+
+
+
+
+
+
+

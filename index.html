@@ -5,8 +5,13 @@
 		<script src="http://d3js.org/d3.v3.min.js"></script>
 
 		<style>
+
+			h2 {
+				text-align: center;
+			}
+
 			.axis text {
-				  font: 10px sans-serif;
+				  font: 12px sans-serif;
 				}
 
 			.axis path,
@@ -15,6 +20,7 @@
 				  stroke: #000;
 				  shape-rendering: crispEdges;
 				}
+
 		</style>
 
 		<script type="text/javascript">
@@ -48,12 +54,12 @@
 	        }
 
 	        function sortData(data, sort_field) {
-	        	var sortFxn = function(a, b) { 
+	        	var sortFxn = function(a, b) {
 				        			var keyA = a[sort_field],
 				        				keyB = b[sort_field];
 				        			if (keyA < keyB) { return -1; }
 				        			if (keyA > keyB) { return  1; }
-				        			return 0; 
+				        			return 0;
 				        		};
 		        for (i = 0; i < data.length; i++) {
 		        	data[i].sort(sortFxn);
@@ -91,8 +97,12 @@
 	        var setupSpace = function setupSpace() {
 		        // Setup SVG space
 		        margin = 75;
-		        width = 1400 - margin;
-		        height = 600 - margin;
+		        width = 950 - margin;
+		        height = 500 - margin;
+
+		        title = d3.select('body')
+		        		  .append('h2')
+		        		  .text('Titanic Survivors');
 
 		        svg = d3.select("body")
 		        	    .append("svg")
@@ -102,7 +112,7 @@
 		        chartGroup = svg.append('g').attr('class','chart');
 		        xAxisGroup = svg.append('g').attr('class', 'x axis');
 		        yAxisGroup = svg.append('g').attr('class', 'y axis');
-	        }
+	        };
 
 	        var xScale, yScale, merged;
 
@@ -140,6 +150,22 @@
 	        	yAxisGroup.transition()
 	        			  .attr('transform', 'translate (' + [xScale(ageRanges[0]), 0] + ')')
 	        			  .call(yAxis);
+
+	        	yAxisGroup.append('text')
+	        		.attr('transform', 'rotate(-90)')
+	        		.attr('y', -50)
+	        		.attr('x', 0 - ((height / 2) - 130))
+	        		.attr('dy', '1em')
+	        		.style('text-anchor', 'middle')
+	        		.text('Survived');
+
+	        	yAxisGroup.append('text')
+	        		.attr('transform', 'rotate(-90)')
+	        		.attr('y', -50)
+	        		.attr('x', 0 - ((height / 2) + 30))
+	        		.attr('dy', '1em')
+	        		.style('text-anchor', 'middle')
+	        		.text('Died');
 	        };
 
 	        // Update Bars
@@ -148,9 +174,9 @@
 	        	var color = {
 	        				  'male'   : '#3399FF',
 	        				  'female' : '#FF3399',
-	        				  '1Class' : '#B2D9B2',
-	        				  '2Class' : '#008000',
-	        				  '3Class' : '#002600'
+	        				  '1class' : '#B2D9B2',
+	        				  '2class' : '#008000',
+	        				  '3class' : '#002600'
 	        				};
 
 	        	// Group setup
@@ -181,6 +207,25 @@
 					.attr('x', function(d, i) { return xScale(d.AgeRange); })
 					.attr('y', function(d, i) { return yScale(d.y0); })
 					.attr('height', function(d, i) { return yScale(0) - yScale(1); });
+
+				var legend = chartGroup.append('g')
+								.attr('class', 'legend')
+								.attr('transform', 'translate(' + (width - 100) + ', ' + 20 + ')')
+								.selectAll('g')
+								.data(['Male', 'Female'])
+								.enter().append('g');
+
+				legend.append('rect')
+					  .attr('y', function(d, i) { return i * 30; })
+					  .attr('x', 15)
+					  .attr('width', 20)
+					  .attr('height', 20)
+					  .attr('fill', function(d) { return color[d.toLowerCase()]; });
+
+				legend.append('text')
+					  .attr('y', function(d, i) { return i * 30 + 15; })
+					  .attr('x', 50)
+					  .text(function(d) { return d; });
 
         		return bars;
 	        };
@@ -233,7 +278,7 @@
 		        }
 
 		        // Sort by Gender
-		        sortField = 'Sex'
+		        sortField = 'Sex';
 		        ages_data = sortData(ages_data, sortField);
 
 		        setupSpace();
