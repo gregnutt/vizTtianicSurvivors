@@ -10,9 +10,12 @@
 				text-align: center;
 			}
 
-			.axis text {
+			.x.axis text {
 				  font: 12px sans-serif;
 				  font-weight: bold;
+				}
+			.y.axis text {
+				  font: 14px sans-serif;
 				}
 
 			.axis path,
@@ -38,7 +41,6 @@
 	        var i, j;
 	        var ages_data, stacked_data;
 	        var margin, width, height;
-	        var chartTitle;
 	        var barGroups, bars, legend;
 	        var filter, buttons;
 	        var svg, chartGroup, xAxisGroup, yAxisGroup;
@@ -51,8 +53,18 @@
 	        };
 
 	        // Functions
-	        function dataTrim(d, field, null_value) {
-	        	// Abstracted function to remove empty values from the dataset
+	        var dataTrim = function dataTrim(d, field, null_value) {
+	        	/*
+	        	Abstracted function to remove observations with empty values from the dataset.
+	        	Paramters:
+	        		d - array - The dataset to be trimmed
+	        		field - string - The field name to be trimmed of null values
+	        		null_value - value - The value in the dataset to be removed,
+	        								could be string or integer
+	        	Return:
+	        		d - array - The input dataset with identified observations with
+	        							identified values removed.
+	        	*/
 	        	var null_entries = [];
 
 	        	for (i = 0; i < d.length; i++) {
@@ -65,9 +77,16 @@
 	        	}
 
 	        	return d;
-	        }
+	        };
 
-	        function sortData(data) {
+	        var sortData = function sortData(data) {
+	        	/*
+				Function to sort dataset based on the global 'sortField'.
+				Parameters:
+					data - array - The dataset to be sorted
+				Return:
+					data - array - The sorted dataset
+	        	*/
 	        	var sortFxn = function(a, b) {
 				        			var keyA = a[sortField],
 				        				keyB = b[sortField];
@@ -79,10 +98,18 @@
 		        	data[i].sort(sortFxn);
 		        }
 		        return data;
-	        }
+	        };
 
 	        var setupStack = function setupStack(data){
-	       	// Function to split bar above and below xAxis
+	        /*
+	       	Function to split observations above and below the xAxis based on Survival
+	       	Parameters:
+	       		data - array - The dataset to be processed
+	       	Return:
+	       		data - array - The input dataset with a new field added to each
+	       							array, y0, which will be used for placing the
+	       							observation on the stacked bar chart
+	       	*/
 	        	for (var i = 0; i < data.length; i++) {
 	        		// Above Axis
 	        		var baseSurvived = 0;
@@ -106,31 +133,49 @@
 	        };
 
 	        var setupSpace = function setupSpace() {
-		        // Setup SVG space
+	        	/*
+		        Function to setup the SVG space
+		        Parameters:
+		        	none
+		        Return:
+		        	none
+		        */
+		        // Set bounds
 		        margin = 75;
 		        width = 950 - margin;
 		        height = 500 - margin;
 
+		        // Add title
 		        title = d3.select('body')
 		        		  .append('h2')
 		        		  .text('Number of Titanic Survivors by Age Range');
 
+		        // Create base SVG element
 		        svg = d3.select("body")
 		        	    .append("svg")
 		            	  .attr("width", width + margin)
 		            	  .attr("height", height + margin);
 
+		        // Create groups for chart building
 		        chartGroup = svg.append('g').attr('class','chart');
 		        xAxisGroup = svg.append('g').attr('class', 'x axis');
 		        yAxisGroup = svg.append('g').attr('class', 'y axis');
 	        };
 
-	        // Setup Scales and Axes
 	        var updateScales = function updateScales(data) {
+	        /*
+	        Function to setup the Scales and Axes for the chart
+	        Parameters:
+	        	data - array - The dataset to be used to set the bounds of the axes
+	        Return:
+	        	none
+	        */
 	        	xScale = d3.scale.ordinal()
 	        		.domain(ageRanges)
 	        		.rangeRoundBands([margin, width - margin], 0.05);
 
+	        	// Merge the expanded ages dataset to a single dataset
+	        	//			to find global limit for yAxis
 	        	var merged = d3.merge(data);
 
 	        	yScale = d3.scale.linear()
@@ -143,7 +188,14 @@
 	        				   .range([height - margin, margin]);
 	        };
 
-	        var updateAxis = function() {
+	        var updateAxis = function updateAxis() {
+	        /*
+	        Function to draw and update the Axes
+	        Parameters:
+	        	none
+	        Return:
+	        	none
+	        */
 	        	var xAxis = d3.svg.axis()
 	        				  .scale(xScale)
 	        				  .orient('bottom')
@@ -178,7 +230,14 @@
 	        };
 
 	        var updateBars = function updateBars(data) {
-
+	        /*
+	        Function to draw and update the stacked bar chart
+	        Parameters:
+	        	data - array - The dataset to be plotted on the bar chart
+	        Return:
+	        	none
+	        */
+	        	// Colors selected from ColorBrewer2
 	        	var color = {
 	        				  'male'   				: '#b3cde3',
 	        				  'female' 				: '#fbb4ae',
@@ -198,8 +257,8 @@
 						 .append('svg:g')
 						 .attr('class', 'barGroup');
 
-				if (bars !== undefined) { bars.remove(); }
 				// Stacked group setup
+				if (bars !== undefined) { bars.remove(); }
 				bars = barGroups.selectAll('.bar')
 						 			.data(function(d) { return d; });
 
@@ -220,6 +279,7 @@
 					.attr('y', function(d, i) { return yScale(d.y0); })
 					.attr('height', function(d, i) { return yScale(0) - yScale(1); });
 
+				// Legend setup
 				if (legend !== undefined) { legend.remove(); }
 				legend = chartGroup.append('g')
 								.attr('class', 'legend')
@@ -245,11 +305,16 @@
 					  .attr('y', function(d, i) { return i * 30 + 15; })
 					  .attr('x', 50)
 					  .text(function(d) { return d; });
-
-        		return bars;
 	        };
 
 	        var updateSpace = function updateSpace(sort_field) {
+	        /*
+	        Function to draw and update the chart space
+	        Parameters:
+	        	sort_field - string - The field in the dataset to be used to sort the data
+	        Return:
+	        	none
+	        */
 	        	// Update sortField variable, if necessary
 	        	if (sort_field !== undefined) { sortField = sort_field; }
 
@@ -261,9 +326,14 @@
         	};
 
 			var drawChart = function drawChart(data) {
-			    /*
-			      D3.js setup code
-			    */
+		    /*
+		    Base function to kick off the chart building functionality
+		    Parameters:
+		    	data - array - Dataset to build the chart off of
+		    Return:
+		    	none
+		    */
+		    	// D3.js setup code
 		        "use strict";
 
 		        // Format the data //
@@ -307,14 +377,17 @@
 		        	}
 		        }
 
+		        // Setup the chart space
 		        setupSpace();
 
+		        // Draw the chart
 		        updateSpace(sortField);
 
+		        // Add color filter selection
 				filter = chartGroup.append('g')
 								.attr('class', 'sortButtons')
-								.attr('transform', 
-									'translate(' + (width - 100) + ', ' + (height - 50) + ')')
+								.attr('transform',
+									'translate(' + (width - 100) + ', ' + (height - 150) + ')')
 								.selectAll('g')
 								.data(Object.keys(sort_list))
 								.enter().append('g');
@@ -338,6 +411,7 @@
 								.attr('fill', '#e41a1c')
 								.attr('opacity', 0.3);
 
+				// On button click, update the chart space
 				buttons.on('click', function(d) {
 						d3.select('.sortButtons')
 						  .selectAll('rect')
