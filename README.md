@@ -6,6 +6,13 @@ For this visualization, I utilized the RMS Titanic survivors data from the Machi
 
 One point of note for this dataset is that it did come from a Machine Learning competition data files as a Training Set.  This means that the data backing this visualization is not a complete recount of the passengers of the RMS Titanic.  The remainder of the passenger data, however, has had the information regarding the passengers' survival striped to make the competition a challenge.  However, even with this subset of the passenger list, one can easily make out the general distributions across the filters.
 
+###Design
+I chose to share my findings using a stacked bar chart to represent a compact visual comparison Survivors vs Casualties across age groups with the avaiability to include Sex, Passenger Class, and Embarkation Location.  I think the stacked bar chart, with positive and negative values, offers a great visual experience when viewing this visualization by allowing the audience to easily distinguish the distribution of survivors and casualties and allows for further distinction by other factors.  In addition, it lends itself nicely to taking on an almost iceberg-like appearence, with trailing ends and a larger group under the xAxis than above.
+
+The age groups were separated by position along the xAxis in distinct bars within the stacked bar chart, ordered from the youngest group to the oldest group.  Position was also used to encode the Survivors and Casualties, survivors sitting above the xAxis and casualties sitting below.
+
+Color was utilized to further break down the age groups by Sex.  This was chosen to take advantage of the natural distinction of male and female with blue and pink hues, respectively.  In addition to this, I provided the ability for the audience to explore the data a little further by utilizing color to separate the passengers based on Passenger Class and Embarkation Location as an alternative to their Sex.  The colors utilized for the Passenger Class and Embarkation Location were chosen to be complementary to the colors of the Sex, to not distract from the data.  To do this, I utilized ColorBrewer2 to pick a color set to utilize within my graphic.
+
 ###Feedback:
 
 ######"I don't find the colors for male and female to be complementary."
