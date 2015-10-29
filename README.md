@@ -33,6 +33,17 @@ After some clarification, we determined that the yAxis labels were too small and
 ######"Provide better commenting for the functions, including any parameters needed and the expected result."
 Went through and thoroughly commented the codebase for better readibility.
 
+###Revisions:
+
+######Revision for Review 1
+http://bl.ocks.org/gregnutt/f5fd434e9970009d456e
+
+######Revision for Review 2
+http://bl.ocks.org/gregnutt/6eb5a1bd68f60b702892
+
+######Revision for Review 3
+http://bl.ocks.org/gregnutt/d42f7317092fc1fa910f
+
 ###Sources:
 
 #####Help with general JavaScript functions
