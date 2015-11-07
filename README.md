@@ -33,6 +33,9 @@ After some clarification, we determined that the yAxis labels were too small and
 ######"Provide better commenting for the functions, including any parameters needed and the expected result."
 Went through and thoroughly commented the codebase for better readibility.
 
+######"Chart not Explanatory"
+Updated chart title to reflect the story I'm attempting to share with the audience.  In addition, I added some text to the graphic detailing the history of the saying 'Women and Children First' and inviting the audience to exlore the data further.
+
 ###Revisions:
 
 ######Revision for Review 1
